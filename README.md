@@ -1,5 +1,10 @@
 # Supervisor
 
+
+## Demo ?
+
+[![Watch the video](/demo.png)](https://i.imgur.com/itRGzTq.mp4)
+
 ## Project setup
 1. 
 ```shell
