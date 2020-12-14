@@ -48,7 +48,10 @@
       </el-card>
     </center>
 
-    <div :style="`width: ${overlayVisible == true ? '100%' : '0'}`" class="overlay">
+    <div
+      :style="`width: ${overlayVisible == true ? '100%' : '0'}`"
+      class="overlay"
+    >
       <!-- Button to close the overlay navigation -->
       <a
         href="javascript:void(0)"
@@ -61,12 +64,18 @@
       <div class="overlay-content">
         <center>
           <div
-          v-if="hoveredElement != null"
-          v-on:click="showUserScreen(hoveredElement)"
-          :style="`background-image: url(${hoveredElement.stream});`"
-          class="bg-purple"
-          style="width: 40%; height: 50vh; background-position: center; background-size: contain; background-repeat: no-repeat"
-        ></div>
+            v-if="hoveredElement != null"
+            v-on:click="showUserScreen(hoveredElement)"
+            :style="`background-image: url(${hoveredElement.stream});`"
+            class="bg-purple"
+            style="
+              width: 65%;
+              height: 75vh;
+              background-position: center;
+              background-size: contain;
+              background-repeat: no-repeat;
+            "
+          ></div>
         </center>
       </div>
     </div>
@@ -85,7 +94,7 @@ export default {
     };
   },
   created() {
-    document.addEventListener('keyup', this.hideOverlay);
+    document.addEventListener("keyup", this.hideOverlay);
   },
   mounted() {
     this.$socket.emit("holder-id", {
@@ -113,6 +122,9 @@ export default {
         });
         this.userStreams.push(data);
       } else {
+        if(this.hoveredElement != null && this.hoveredElement.sid == data.sid) {
+          this.hoveredElement = data
+        }
         this.userStreams.splice(
           this.userStreams.findIndex((x) => x.sid == data.sid),
           1,
@@ -147,11 +159,11 @@ export default {
       this.overlayVisible = true;
     },
     hideOverlay(event) {
-      if(event.keyCode === 27) {
-        this.overlayVisible = false
-        this.hoveredElement = null
+      if (event.keyCode === 27) {
+        this.overlayVisible = false;
+        this.hoveredElement = null;
       }
-    }
+    },
   },
 };
 </script>
@@ -183,38 +195,28 @@ body {
   background-size: contain;
 }
 
-.user-screen-large {
-  transform: scale(450%) translate(50%, 25%);
-  border-radius: 0 !important;
-  position: relative;
-  top: 50%;
-  left: 50%;
-  transition: 0.5s;
-}
-
 /* Overlay management */
-/* The Overlay (background) */
 .overlay {
-  /* Height & width depends on how you want to reveal the overlay (see JS below) */
+
   height: 100%;
   width: 0;
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  position: fixed;
+  z-index: 1;
   left: 0;
   top: 0;
-  background-color: rgb(0, 0, 0); /* Black fallback color */
-  background-color: rgba(0, 0, 0, 0.5); /* Black w/opacity */
-  overflow-x: hidden; /* Disable horizontal scroll */
-  transition: 0.5s; /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.3);
+  overflow-x: hidden;
+  transition: 0.5s;
 }
 
 /* Position the content inside the overlay */
 .overlay-content {
   position: relative;
-  top: 25%; /* 25% from the top */
-  width: 100%; /* 100% width */
-  text-align: center; /* Centered text/links */
-  margin-top: 30px; /* 30px top margin to avoid conflict with the close button on smaller screens */
+  top: 10%;
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
 }
 
 /* The navigation links inside the overlay */
@@ -223,8 +225,8 @@ body {
   text-decoration: none;
   font-size: 36px;
   color: #818181;
-  display: block; /* Display block instead of inline */
-  transition: 0.3s; /* Transition effects on hover (color) */
+  display: block;
+  transition: 0.3s;
 }
 
 /* When you mouse over the navigation links, change their color */
