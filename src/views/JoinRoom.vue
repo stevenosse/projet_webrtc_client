@@ -55,6 +55,7 @@
             native-type="submit"
             type="danger"
             block
+            @click="leaveRoom()"
           >
             Quitter
           </el-button>
@@ -65,6 +66,8 @@
 </template>
 
 <script>
+import SimplePeer from "simple-peer";
+
 export default {
   name: "join",
   data() {
@@ -72,11 +75,13 @@ export default {
       started: false,
       room: {},
       model: {
-        name: "Steve",
+        name: "Steve Nosse",
       },
-      offer: "",
     };
   },
+  /**
+   * TODO: leave room on screen sharing stopped
+   */
   created() {
     this.sockets.subscribe("room-does-not-exist", () => {
       this.$message({
@@ -87,42 +92,66 @@ export default {
 
     this.sockets.subscribe("join-room", (room) => {
       navigator.mediaDevices.getDisplayMedia({}).then((stream) => {
-        var video = document.createElement("video");
-        video.srcObject = stream;
-        video.play();
+        this.initScreenshotsStream(stream);
 
-        var canvas = document.createElement("canvas");
-        var context = canvas.getContext("2d");
+        this.sockets.subscribe("start-unique-user-stream", () => {
+          this.$peer = new SimplePeer({
+            initiator: true,
+            stream: stream,
+            trickle: false
+          });
 
-        canvas.width = window.screen.width
-        canvas.height = window.screen.height
-
-        context.width = canvas.width;
-        context.height = canvas.height;
+          this.$peer.on("signal", (data) => {
+            this.$socket.emit('unique-user-stream', data)
+          });
+        });
 
         this.started = true;
-        this.room = room
+        this.room = room;
         this.$message({
           type: "success",
           message: "Vous êtes maintenant connecté à l'évaluation.",
         });
-
-        setInterval(() => {
-          context.drawImage(video, 0, 0, context.width, context.height);
-
-          this.$socket.emit("stream", {
-            name: this.model.name,
-            stream: canvas.toDataURL("image/webp"),
-          });
-        }, 2000);
       });
     });
   },
   methods: {
-    leaveRoom() {},
+    initScreenshotsStream(stream) {
+      var video = document.createElement("video");
+      video.srcObject = stream;
+      video.play();
+
+      var canvas = document.createElement("canvas");
+      var context = canvas.getContext("2d");
+
+      canvas.width = window.screen.width;
+      canvas.height = window.screen.height;
+
+      context.width = canvas.width;
+      context.height = canvas.height;
+
+      setTimeout(() => {
+        this.refreshScreen(canvas, context, video);
+      }, 200);
+
+      setInterval(() => {
+        this.refreshScreen(canvas, context, video);
+      }, 5000);
+    },
+    leaveRoom() {
+      window.location.reload();
+    },
     joinRoom() {
       this.model.room = this.$route.params.id;
       this.$socket.emit("join-room", this.model);
+    },
+    refreshScreen(canvas, context, video) {
+      context.drawImage(video, 0, 0, context.width, context.height);
+      this.$socket.emit("stream", {
+        name: this.model.name,
+        stream: canvas.toDataURL("image/webp"),
+        room: this.room._id,
+      });
     },
   },
 };

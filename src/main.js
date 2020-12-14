@@ -4,6 +4,7 @@ import router from './router'
 
 Vue.config.productionTip = false
 
+require('./config/globals')
 require('./config/plugins')
 require('./config/socket-io')
 import('./config/peer')

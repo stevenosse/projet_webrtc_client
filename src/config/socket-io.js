@@ -1,12 +1,12 @@
-import Vue from 'vue'
-import VueSocketIO from 'vue-socket.io'
+import Vue from "vue";
+import VueSocketIO from "vue-socket.io";
 
 const socketClient = new VueSocketIO({
-  debug: true,
-  connection: "https://192.168.1.6:3000",
+  debug: false,
+  connection: "https://" + window.endpoint + ":3000",
   options: {
     reconnection: false,
-  }
-})
+  },
+});
 
-Vue.use(socketClient)
+Vue.use(socketClient);

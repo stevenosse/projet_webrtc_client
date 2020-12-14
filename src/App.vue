@@ -4,6 +4,14 @@
   </div>
 </template>
 
+<script>
+export default {
+  mounted() {
+    this.sockets.subscribe("connect", () => {});
+  },
+};
+</script>
+
 <style lang="scss">
 #app {
   font-family: Open Sans, sans-serif;
