@@ -18,7 +18,8 @@ export default {
     if(this.$peer == null) {
       this.$peer = new SimplePeer({
         initiator: false,
-        trickle: false
+        trickle: false,
+        // config: window.peerConfig
       })
     }
 

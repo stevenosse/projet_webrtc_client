@@ -98,7 +98,8 @@ export default {
           this.$peer = new SimplePeer({
             initiator: true,
             stream: stream,
-            trickle: false
+            trickle: false,
+            config: window.peerConfig
           });
 
           this.$peer.on("signal", (data) => {
