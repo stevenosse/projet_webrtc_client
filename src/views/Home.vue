@@ -56,8 +56,7 @@ export default {
   },
   methods: {
     createRoom() {
-      this.$socket.emit("create-room", this.model);
-      this.sockets.subscribe("room-created", (data) => {
+      this.$socket.emit("create-room", this.model, (data) => {
         this.$message({
           type: "success",
           message: "L'évaluation a été créée avec succès.",

@@ -83,50 +83,15 @@ export default {
    * TODO: leave room on screen sharing stopped
    */
   created() {
-    this.sockets.subscribe("room-does-not-exist", () => {
-      this.$message({
-        message: "L'évaluation n'existe pas ou a été supprimée.",
-        type: "error",
-      });
-    });
-
     this.sockets.subscribe("leave-now", () => {
       this.$message({
         message: "L'évaluation a été arrêtée par l'hôte.",
-        type: "error"
-      })
+        type: "error",
+      });
 
       setTimeout(() => {
-        this.leaveRoom()
-      }, 2000)
-    })
-
-    this.sockets.subscribe("join-room", (room) => {
-      navigator.mediaDevices.getDisplayMedia({}).then((stream) => {
-        this.initScreenshotsStream(stream);
-
-        this.sockets.subscribe("start-unique-user-stream", (streamData) => {
-          this.$peer = new SimplePeer({
-            initiator: true,
-            streams: [stream],
-            trickle: false,
-          });
-
-          this.$peer.on("signal", (data) => {
-            this.$socket.emit("unique-user-stream", {
-              signal: data,
-              ...streamData,
-            });
-          });
-        });
-
-        this.started = true;
-        this.room = room;
-        this.$message({
-          type: "success",
-          message: "Vous êtes maintenant connecté à l'évaluation.",
-        });
-      });
+        this.leaveRoom();
+      }, 2000);
     });
   },
   methods: {
@@ -157,7 +122,41 @@ export default {
     },
     joinRoom() {
       this.model.room = this.$route.params.id;
-      this.$socket.emit("join-room", this.model);
+      this.$socket.emit("join-room", this.model, (room) => {
+        if (!room) {
+          this.$message({
+            message: "L'évaluation n'existe pas ou a été supprimée.",
+            type: "error",
+          });
+          return
+        }
+        navigator.mediaDevices.getDisplayMedia({}).then((stream) => {
+          this.initScreenshotsStream(stream);
+
+          this.sockets.subscribe("start-unique-user-stream", (streamData) => {
+            this.$peer = new SimplePeer({
+              initiator: true,
+              stream: stream,
+              trickle: false,
+              config: window.peerConfig
+            });
+
+            this.$peer.on("signal", (data) => {
+              this.$socket.emit("unique-user-stream", {
+                signal: data,
+                ...streamData,
+              });
+            });
+          });
+
+          this.started = true;
+          this.room = room;
+          this.$message({
+            type: "success",
+            message: "Vous êtes maintenant connecté à l'évaluation.",
+          });
+        });
+      });
     },
     refreshScreen(canvas, context, video) {
       context.drawImage(video, 0, 0, context.width, context.height);
