@@ -90,20 +90,33 @@ export default {
       });
     });
 
+    this.sockets.subscribe("leave-now", () => {
+      this.$message({
+        message: "L'évaluation a été arrêtée par l'hôte.",
+        type: "error"
+      })
+
+      setTimeout(() => {
+        this.leaveRoom()
+      }, 2000)
+    })
+
     this.sockets.subscribe("join-room", (room) => {
       navigator.mediaDevices.getDisplayMedia({}).then((stream) => {
         this.initScreenshotsStream(stream);
 
-        this.sockets.subscribe("start-unique-user-stream", () => {
+        this.sockets.subscribe("start-unique-user-stream", (streamData) => {
           this.$peer = new SimplePeer({
             initiator: true,
-            stream: stream,
+            streams: [stream],
             trickle: false,
-            config: window.peerConfig
           });
 
           this.$peer.on("signal", (data) => {
-            this.$socket.emit('unique-user-stream', data)
+            this.$socket.emit("unique-user-stream", {
+              signal: data,
+              ...streamData,
+            });
           });
         });
 

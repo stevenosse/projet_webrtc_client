@@ -10,10 +10,14 @@
         <template slot="title"
           ><el-button icon="el-icon-setting"></el-button
         ></template>
-        <el-menu-item index="2-1"
-          ><el-icon class="el-icon-close"></el-icon> Terminer la
-          surveillance</el-menu-item
-        >
+        <el-menu-item index="2-1">
+          <el-icon class="el-icon-document"></el-icon>
+          Journal d'évaluation
+        </el-menu-item>
+        <el-menu-item @click="onTerminateSession" index="2-1">
+          <el-icon class="el-icon-close"></el-icon>
+          Terminer la surveillance
+        </el-menu-item>
       </el-submenu>
 
       <el-menu-item index="0">
@@ -79,6 +83,30 @@
         </center>
       </div>
     </div>
+    <el-dialog
+      title="Attention"
+      :visible.sync="confirmTerminateSessionVisible"
+      width="45%"
+      lock-scroll
+      close-on-click-modal
+      close-on-press-escape
+      :center="true"
+    >
+      <span>
+        Vous êtes sur le point de mettre fin à la surveillance. <br />
+        Cette action va arrêter le partage d'écran chez tous les étudiants.
+        <br />
+        Voulez-vous continuer ?
+      </span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="confirmTerminateSessionVisible = false"
+          >Annuler</el-button
+        >
+        <el-button type="primary" @click="onTerminateSessionConfirmed()">
+          Confirmer
+        </el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -91,6 +119,7 @@ export default {
       hoveredElement: null,
       overlayVisible: false,
       userStreams: [],
+      confirmTerminateSessionVisible: false,
     };
   },
   created() {
@@ -122,8 +151,11 @@ export default {
         });
         this.userStreams.push(data);
       } else {
-        if(this.hoveredElement != null && this.hoveredElement.sid == data.sid) {
-          this.hoveredElement = data
+        if (
+          this.hoveredElement != null &&
+          this.hoveredElement.sid == data.sid
+        ) {
+          this.hoveredElement = data;
         }
         this.userStreams.splice(
           this.userStreams.findIndex((x) => x.sid == data.sid),
@@ -135,6 +167,19 @@ export default {
   },
   methods: {
     handleSelect() {},
+    onTerminateSession() {
+      this.confirmTerminateSessionVisible = true;
+    },
+    onTerminateSessionConfirmed() {
+      const users = this.userStreams.map((usm) => usm.sid);
+      this.$socket.emit("terminate-session", {
+        students: users,
+      });
+      this.confirmTerminateSessionVisible = false;
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
+    },
     copyMeetingLink() {
       const link = window.location.toString() + "/join";
       navigator.clipboard.writeText(link);
@@ -197,7 +242,6 @@ body {
 
 /* Overlay management */
 .overlay {
-
   height: 100%;
   width: 0;
   position: fixed;
