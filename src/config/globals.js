@@ -1,2 +1,2 @@
-window.endpoint = "172.16.32.28"
+window.endpoint = "192.168.1.6"
 window.PORT = 3000

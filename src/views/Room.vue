@@ -30,9 +30,9 @@
     <el-row v-if="userStreams.length > 0" class="page-content" :gutter="20">
       <el-col v-for="(item, index) in userStreams" :key="index" :span="4">
         <div
-          v-on:click="showUserScreen(item)"
+          
           :style="`background-image: url(${item.stream});`"
-          v-on:mouseover="showOverlay(item)"
+          v-on:click="showOverlay(item)"
           class="grid-content bg-purple"
         ></div>
         <span class="grid-title">{{ item.name }}</span>
@@ -86,7 +86,7 @@
     <el-dialog
       title="Attention"
       :visible.sync="confirmTerminateSessionVisible"
-      width="45%"
+      width="35%"
       lock-scroll
       close-on-click-modal
       close-on-press-escape
@@ -137,6 +137,10 @@ export default {
           type: "error",
           message: `${this.userStreams[idx].name} s'est déconnecté.`,
         });
+        this.$socket.emit("user-leaved", {
+          username: this.userStreams[idx].name,
+          room: this.$route.params.id,
+        })
         this.userStreams.splice(idx, 1);
       }
     });
@@ -174,6 +178,7 @@ export default {
       const users = this.userStreams.map((usm) => usm.sid);
       this.$socket.emit("terminate-session", {
         students: users,
+        room: this.$route.params.id
       });
       this.confirmTerminateSessionVisible = false;
       setTimeout(() => {
@@ -213,7 +218,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 body {
   overflow: hidden;
 }

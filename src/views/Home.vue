@@ -49,28 +49,41 @@ export default {
   data() {
     return {
       model: {
-        duration : '02:00',
-        subject: 'DevTest'
+        duration: "",
+        subject: "",
       },
     };
   },
   methods: {
     createRoom() {
-      this.$socket.emit('create-room', this.model)
-      this.sockets.subscribe('room-created', data => {
+      this.$socket.emit("create-room", this.model);
+      this.sockets.subscribe("room-created", (data) => {
         this.$message({
-          type: 'success',
-          message: 'L\'évaluation a été créée avec succès.'
-        })
-        this.$router.push({ name: 'rooms.show', params: { id: data._id } })
-      })
+          type: "success",
+          message: "L'évaluation a été créée avec succès.",
+        });
+        this.$router.push({ name: "rooms.show", params: { id: data._id } });
+      });
     },
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
+$teal: rgb(0, 124, 137);
+.el-button--primary {
+  background: $teal;
+  border-color: $teal;
+
+  &:hover,
+  &.active,
+  &:focus {
+    background: lighten($teal, 7);
+    border-color: lighten($teal, 7);
+  }
+}
+
 .login {
   flex: 1;
   display: flex;

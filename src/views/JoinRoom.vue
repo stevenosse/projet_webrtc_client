@@ -75,7 +75,7 @@ export default {
       started: false,
       room: {},
       model: {
-        name: "Steve Nosse",
+        name: "",
       },
     };
   },
