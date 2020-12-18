@@ -35,7 +35,7 @@
             native-type="submit"
             block
           >
-            OBTENIR LE LIEN
+            DEMARRER LA SESSION
           </el-button>
         </el-form-item>
       </el-form>

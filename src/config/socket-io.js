@@ -3,7 +3,7 @@ import VueSocketIO from "vue-socket.io";
 
 const socketClient = new VueSocketIO({
   debug: false,
-  connection: "https://" + window.endpoint + ":3000",
+  connection: "https://" + window.ENDPOINT + ":"+window.PORT,
   options: {
     reconnection: false,
   },

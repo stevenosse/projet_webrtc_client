@@ -1,2 +1,2 @@
-window.endpoint = "192.168.1.6"
+window.ENDPOINT = "localhost"
 window.PORT = 3000

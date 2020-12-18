@@ -109,6 +109,9 @@ export default {
       context.width = canvas.width;
       context.height = canvas.height;
 
+      /**
+       * Send first screen immediately
+       */
       setTimeout(() => {
         this.refreshScreen(canvas, context, video);
       }, 200);
@@ -128,7 +131,7 @@ export default {
             message: "L'évaluation n'existe pas ou a été supprimée.",
             type: "error",
           });
-          return
+          return;
         }
         navigator.mediaDevices.getDisplayMedia({}).then((stream) => {
           this.initScreenshotsStream(stream);
@@ -138,7 +141,7 @@ export default {
               initiator: true,
               stream: stream,
               trickle: false,
-              config: window.peerConfig
+              config: window.peerConfig,
             });
 
             this.$peer.on("signal", (data) => {
